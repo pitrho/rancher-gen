@@ -38,7 +38,7 @@ class API(object):
             # the stack name
             stack_name = resource['labels']['io.rancher.stack.name']
             service_name = resource['labels']['io.rancher.stack_service.name']
-            service_name = service_name.split('/')[0]
+            service_name = service_name.split('/')[1]
             return self._get_service_from_stack(stack_name, service_name)
         return None
 
@@ -48,19 +48,26 @@ class API(object):
             'Authorization': 'Basic {0}'.format(self.api_token)
         }
         protocol = 'https' if self.ssl else 'http'
-        url = '{0}://{1}:{2}/v1/projects/{3}/environments?name={4}'\
-            .format(protocol, self.host, self.port, self.project_id, stack_name)
+        url = '{0}://{1}:{2}/v1/projects/{3}/environments'\
+            .format(protocol, self.host, self.port, self.project_id)
         res = requests.get(url, headers=headers)
         res_data = res.json()
-        if len(res_data['data']) == 0:
+        service_stack = None
+        if res_data['data'] and len(res_data['data']) > 0:
+            for stack in res_data['data']:
+                if stack['name'] == stack_name:
+                    service_stack = stack
+                    break
+
+        if not service_stack:
             return None
 
-        # The stack was found, so search for the service in the stack.
-        url = '{0}?name={1}'\
-            .format(res_data['data'][0]['links']['services'], service_name)
+        url = service_stack['links']['services']
         res = requests.get(url, headers=headers)
         res_data = res.json()
         if res_data['data'] and len(res_data['data']) > 0:
-            return res_data['data'][0]
+            for service in res_data['data']:
+                if service['name'] == service_name:
+                    return service
 
         return None

@@ -83,7 +83,6 @@ class RancherConnector(object):
     def _on_message(self, ws, message):
         msg = json.loads(message)
         if msg['name'] == 'resource.change' and msg['data']:
-            logger.info(message)
             handler = MessageHandler(msg, self.rancher_host, self.rancher_port,
                                      self.project_id, self.api_token,
                                      self.template, self.dest, self.ssl,
@@ -126,11 +125,9 @@ class MessageHandler(Thread):
             api = API(self.rancher_host, self.rancher_port, self.project_id,
                       self.api_token, self.ssl)
 
-            # service = self._get_service(resource)
             service = api.get_service(resource)
             instances = []
             if service:
-                # instances = self._get_instances(service)
                 instances = api.get_instances(service)
                 if instances is None:
                     instances = []
