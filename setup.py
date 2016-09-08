@@ -46,7 +46,7 @@ with open('rancher_gen/__init__.py', 'rb') as f:
 setup(
     name='rancher-gen',
     version=__version__,
-    description="File generator that renders templates using rancher-metadata",
+    description="File generator that renders templates using Rancher API",
     long_description=open('README.md', 'r').read(),
     maintainer="Pit Rho Corporation",
     license="MIT",
