@@ -1,0 +1,4 @@
+hello:
+  image: tutum/hello-world
+  labels:
+    io.rancher.container.requested_ip: "10.42.232.33"

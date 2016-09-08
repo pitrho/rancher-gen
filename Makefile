@@ -1,9 +1,11 @@
+ENV_FILE := .env.test
+ENV := $(shell cat ${ENV_FILE})
 PYPI_SERVER ?= gemfury
 
 all: clean test
 
 test:
-	python setup.py test -a "-vv ${ARG}"
+	${ENV} python setup.py test -a "-vv ${ARG}"
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +

@@ -39,21 +39,30 @@ class PyTest(TestCommand):
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('rho_boilerplate_package/__init__.py', 'rb') as f:
+with open('rancher_gen/__init__.py', 'rb') as f:
     __version__ = str(ast.literal_eval(_version_re.search(
         f.read().decode('utf-8')).group(1)))
 
 setup(
-    name='rho-boilerplate-package',
+    name='rancher-gen',
     version=__version__,
-    description="Pit Rho Boilerplate Package",
+    description="File generator that renders templates using rancher-metadata",
     long_description=open('README.md', 'r').read(),
     maintainer="Pit Rho Corporation",
-    license="Commercial",
-    url="https://bitbucket.org/pitrho/rho-boilerplate-package",
+    license="MIT",
+    url="https://bitbucket.org/pitrho/rancher-gen",
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
-    install_requires=[],
+    entry_points={
+        'console_scripts': [
+            'rancher-gen=rancher_gen.cli:main'
+        ]
+    },
+    install_requires=[
+        'Jinja2==2.8',
+        'requests==2.11.1',
+        'websocket-client==0.37.0'
+    ],
     extras_require={},
     tests_require=[
         'coverage==4.0a5',
