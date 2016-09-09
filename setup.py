@@ -50,7 +50,7 @@ setup(
     long_description=open('README.md', 'r').read(),
     maintainer="Pit Rho Corporation",
     license="MIT",
-    url="https://bitbucket.org/pitrho/rancher-gen",
+    url="https://github.com/pitrho/rancher-gen",
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
     classifiers=[
