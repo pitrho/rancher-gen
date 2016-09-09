@@ -33,7 +33,7 @@ class PyTest(TestCommand):
         cov.stop()
         cov.report()
         cov.html_report()
-        print "Wrote coverage report to htmlcov directory"
+        print("Wrote coverage report to htmlcov directory")
         sys.exit(errno)
 
 
@@ -53,6 +53,20 @@ setup(
     url="https://bitbucket.org/pitrho/rancher-gen",
     packages=find_packages(exclude=["tests"]),
     include_package_data=True,
+    classifiers=[
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+    ],
     entry_points={
         'console_scripts': [
             'rancher-gen=rancher_gen.cli:main'
@@ -65,9 +79,7 @@ setup(
     ],
     extras_require={},
     tests_require=[
-        'coverage==4.0a5',
-        'mock==1.0.1',
-        'pytest==2.7.1'
+        'tox==2.3.1'
     ],
     cmdclass={'test': PyTest}
 )

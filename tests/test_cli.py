@@ -2,7 +2,7 @@ import sys
 from mock import patch
 from rancher_gen.cli import main
 from rancher_gen.handler import RancherConnector
-from StringIO import StringIO
+from rancher_gen.compat import StringIO
 
 
 class TestCLI:

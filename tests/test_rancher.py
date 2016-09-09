@@ -1,5 +1,5 @@
-import base64
 import os
+from rancher_gen.compat import b64encode
 from rancher_gen.rancher import API
 
 
@@ -12,7 +12,7 @@ class TestAPI:
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
         project_id = stack['accountId']
-        api_token = base64.b64encode("{0}:{1}".format(access_key, secret_key))
+        api_token = b64encode("{0}:{1}".format(access_key, secret_key))
 
         api = API(host, port, project_id, api_token, False)
 
@@ -54,7 +54,7 @@ class TestAPI:
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
         project_id = stack['accountId']
-        api_token = base64.b64encode("{0}:{1}".format(access_key, secret_key))
+        api_token = b64encode("{0}:{1}".format(access_key, secret_key))
 
         api = API(host, port, project_id, api_token, False)
         serv = api.get_service(None, stack['name'], 'hello')

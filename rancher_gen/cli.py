@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 import logging
 import sys
 from argparse import ArgumentParser, Action
@@ -26,19 +28,19 @@ class SetLogLevel(Action):
 
 def validate_args(args):
     if not args.host:
-        print "error: Missing host parameter"
+        print ("error: Missing host parameter")
         return False
 
     if not args.access_key:
-        print "error: Missing Rancher access key parameter"
+        print ("error: Missing Rancher access key parameter")
         return False
 
     if not args.secret_key:
-        print "error: Missing Rancher secret key parameter"
+        print ("error: Missing Rancher secret key parameter")
         return False
 
     if not args.project_id:
-        print "error: Missing Rancher project id parameter"
+        print ("error: Missing Rancher project id parameter")
         return False
 
     return True
@@ -91,7 +93,7 @@ def main():
                                    args.template, args.dest, args.ssl,
                                    args.stack, args.service, args.notify)
         handler()
-    except Exception, e:
+    except Exception as e:
         logger.exception(e)
 
 

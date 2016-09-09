@@ -1,6 +1,7 @@
+from __future__ import absolute_import
+
 import json
 import logging
-import base64
 import os
 import requests
 import ssl
@@ -10,6 +11,7 @@ from jinja2 import Environment, FileSystemLoader
 from subprocess import call
 from threading import Thread
 
+from .compat import b64encode
 from .rancher import API
 
 logger = logging.getLogger(__name__)
@@ -26,8 +28,7 @@ class RancherConnector(object):
         self.rancher_host = host
         self.rancher_port = port
         self.project_id = project_id
-        self.api_token =\
-            base64.b64encode("{0}:{1}".format(access_key, secret_key))
+        self.api_token = b64encode("{0}:{1}".format(access_key, secret_key))
         self.template = template
         self.dest = dest
         self.ssl = ssl

@@ -1,11 +1,11 @@
 import base64
 import json
-import StringIO
 import os
 import time
 from mock import patch
 from threading import Thread
 from rancher_gen.handler import RancherConnector, MessageHandler
+from rancher_gen.compat import b64encode
 
 
 class TestRancherConnector:
@@ -30,7 +30,8 @@ class TestRancherConnector:
 
     @classmethod
     def teardown_class(cls):
-        os.remove(cls.out_file)
+        if os.path.exists(cls.out_file):
+            os.remove(cls.out_file)
 
     def test_prerenders_template(self, stack_service):
         stack, service = stack_service
@@ -87,7 +88,7 @@ class TestMessageHandler:
 
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
-        api_token = base64.b64encode("{0}:{1}".format(access_key, secret_key))
+        api_token = b64encode("{0}:{1}".format(access_key, secret_key))
         config = {
             'message': mock_message,
             'host': os.getenv('RANCHER_HOST'),
@@ -120,7 +121,7 @@ class TestMessageHandler:
 
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
-        api_token = base64.b64encode("{0}:{1}".format(access_key, secret_key))
+        api_token = b64encode("{0}:{1}".format(access_key, secret_key))
         config = {
             'message': mock_message,
             'host': os.getenv('RANCHER_HOST'),

@@ -1,5 +1,8 @@
 # Application Release Notes
 
+## v0.1.1 (2016-09-09)
+* Python 3 compatibility.
+
 ## v0.1.0 (2016-09-08)
 * Initial release. Includes:
   * Logic to listen for changes in Rancher.

@@ -1,9 +1,12 @@
-import base64
+from __future__ import absolute_import
+
 import json
 import os
 import pytest
 import requests
 import time
+
+from rancher_gen.compat import b64encode
 
 
 @pytest.fixture(scope='session')
@@ -12,7 +15,7 @@ def stack_service(request):
     port = int(os.getenv('RANCHER_PORT', 80))
     access_key = os.getenv('RANCHER_ACCESS_KEY')
     secret_key = os.getenv('RANCHER_SECRET_KEY')
-    api_token = base64.b64encode("{0}:{1}".format(access_key, secret_key))
+    api_token = b64encode("{0}:{1}".format(access_key, secret_key))
 
     with open(os.path.join(os.path.dirname(__file__), 'compose.yaml')) as fh:
         compose_string = fh.read()
