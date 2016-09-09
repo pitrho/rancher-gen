@@ -1,6 +1,6 @@
 ENV_FILE := .env.test
 ENV := $(shell cat ${ENV_FILE})
-PYPI_SERVER ?= gemfury
+PYPI_SERVER ?= pypi
 
 all: clean test
 

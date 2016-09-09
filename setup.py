@@ -48,7 +48,7 @@ setup(
     version=__version__,
     description="File generator that renders templates using Rancher API",
     long_description=open('README.md', 'r').read(),
-    maintainer="Pit Rho Corporation",
+    author="Pit Rho Corporation",
     license="MIT",
     url="https://github.com/pitrho/rancher-gen",
     packages=find_packages(exclude=["tests"]),
