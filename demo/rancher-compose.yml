@@ -1,0 +1,5 @@
+ghost:
+  scale: 1
+
+nginx:
+  scale: 1

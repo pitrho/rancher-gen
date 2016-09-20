@@ -1,0 +1,3 @@
+#!/bin/bash
+
+rancher-gen --host $RANCHER_GEN_HOST --port $RANCHER_GEN_PORT --access-key $RANCHER_GEN_ACCESS_KEY --secret-key $RANCHER_GEN_SECRET_KEY --project-id $RANCHER_GEN_PROJECT_ID $RANCHER_GEN_OPTIONS --notify "service nginx reload" /nginxconf/default.j2 /etc/nginx/sites-available/default

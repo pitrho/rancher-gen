@@ -1,0 +1,19 @@
+ghost:
+  image: ghost
+  expose:
+    - "2368"
+
+nginx:
+  image: pitrho/nginx-rancher-gen-demo:latest
+  ports:
+    - 80:80
+  links:
+    - ghost
+  environment:
+    NGINX_RUN_TYPE: rancher-gen
+    RANCHER_GEN_HOST: $RANCHER_HOST
+    RANCHER_GEN_PORT: $RANCHER_PORT
+    RANCHER_GEN_ACCESS_KEY: $RANCHER_ACCESS_KEY
+    RANCHER_GEN_SECRET_KEY: $RANCHER_SECRET_KEY
+    RANCHER_GEN_PROJECT_ID: $RANCHER_GEN_PROJECT_ID
+    RANCHER_GEN_OPTIONS: --stack demo --service ghost

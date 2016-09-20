@@ -1,0 +1,21 @@
+upstream ghost.backend {
+{% for container in containers %}
+  {% if container['state'] == "running" %}
+  server {{container['primaryIpAddress']}}:2368;
+  {% endif %}
+{% endfor %}
+}
+
+server {
+    listen 80;
+    server_name ghost_demo;
+
+    location / {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header HOST $http_host;
+        proxy_set_header X-NginX-Proxy true;
+
+        proxy_pass http://ghost.backend;
+        proxy_redirect off;
+    }
+}
