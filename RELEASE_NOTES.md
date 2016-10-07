@@ -1,5 +1,9 @@
 # Application Release Notes
 
+## v0.2.1 (2016-10-07)
+* Bug fix to ignore messages from instances that don't have labels (e.g Network
+Agent)
+
 ## v0.2.0 (2016-10-07)
 * Added ability to pre-render the template even it no stack and/or service are
 specified.

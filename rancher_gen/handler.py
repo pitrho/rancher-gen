@@ -135,6 +135,13 @@ class MessageHandler(Thread):
 
             # Filter by stack and/or service name if specified
             if self.stack:
+                # Some instnaces like Network Agents don't have labels, and
+                # don't really belong to a stack and/or service, so if this
+                # message has to do with one of those instances, then we
+                # need to ignore it.
+                if resource['labels'] is None:
+                    return
+
                 stack_name = resource['labels']['io.rancher.stack.name']
                 service_name =\
                     resource['labels']['io.rancher.stack_service.name']
