@@ -37,12 +37,36 @@ class TestRancherConnector:
         stack, service = stack_service
         self.config['project_id'] = stack['accountId']
 
+        # Test with filtering by stack and service
         handler = RancherConnector(**self.config)
         handler._prerender()
         with open(self.out_file) as fh:
-            output = fh.read()
+            output = fh.read().replace('\n', '').strip()
 
         assert output == '10.42.232.33;'
+
+        # Test with filtering by stack only
+        config = self.config.copy()
+        config['project_id'] = stack['accountId']
+        config['service'] = None
+        handler = RancherConnector(**config)
+        handler._prerender()
+        with open(self.out_file) as fh:
+            output = fh.read().replace('\n', '').strip()
+
+        assert output == '10.42.232.33;'
+
+        # Test without filtering
+        config = self.config.copy()
+        config['project_id'] = stack['accountId']
+        config['stack'] = None
+        config['service'] = None
+        handler = RancherConnector(**config)
+        handler._prerender()
+        with open(self.out_file) as fh:
+            output = fh.read().replace('\n', '').strip()
+
+        assert '10.42.232.33' in output
 
     def test_on_message_ignores_bad_messages(self):
         handler = RancherConnector(**self.config)
@@ -84,7 +108,7 @@ class TestMessageHandler:
             os.remove(self.out_file)
 
     def test_renders_template(self, stack_service, mock_message):
-        stac, service = stack_service
+        stack, service = stack_service
 
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
@@ -104,16 +128,44 @@ class TestMessageHandler:
             'notify': None
         }
 
+        # Test with stack and service filter
         handler = MessageHandler(**config)
-        handler.start()
+        handler.run()
 
         while not os.path.exists(self.out_file):
             time.sleep(1)
 
         with open(self.out_file) as fh:
-            output = fh.read()
+            output = fh.read().replace('\n', '').strip()
 
         assert output == '10.42.232.33;'
+
+        # Test with stack only filter
+        config['project_id'] = stack['accountId']
+        config['service'] = None
+        handler = MessageHandler(**config)
+        handler.run()
+
+        while not os.path.exists(self.out_file):
+            time.sleep(1)
+
+        with open(self.out_file) as fh:
+            output = fh.read().replace('\n', '').strip()
+
+        assert output == '10.42.232.33;'
+
+        # Test without filter
+        config['stack'] = None
+        handler = MessageHandler(**config)
+        handler.run()
+
+        while not os.path.exists(self.out_file):
+            time.sleep(1)
+
+        with open(self.out_file) as fh:
+            output = fh.read().replace('\n', '').strip()
+
+        assert '10.42.232.33' in output
 
     def test_does_not_render_with_invalid_filter(
             self, stack_service, mock_message):

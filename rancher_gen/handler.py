@@ -41,18 +41,36 @@ class RancherConnector(object):
         self.start()
 
     def _prerender(self):
-        # If we're filtering by stack and service, then look for the service
-        # and if it exists, then render the template.
-        if self.stack and self.service:
+        instances = None
+        api = API(self.rancher_host, self.rancher_port, self.project_id,
+                  self.api_token, self.ssl)
+
+        # If we're not filtering by stack and service, then load all instances
+        # in the environment
+        if self.stack is None and self.service is None:
+            instances = api.get_instances()
+
+        # If we're only filterting by stack, then load the instances for that
+        # stack
+        elif self.stack and self.service is None:
+            instances = api.get_instances(stack_name=self.stack)
+
+        # If we're filtering by stack and service, then load the instances for
+        # that service
+        elif self.stack and self.service:
             api = API(self.rancher_host, self.rancher_port, self.project_id,
                       self.api_token, self.ssl)
             service = api.get_service(resource=None, stack=self.stack,
                                       service=self.service)
             if service:
                 instances = api.get_instances(service)
-                if instances:
-                    render_template(instances, self.template, self.dest)
-                    notify(self.notify)
+
+        # If we found any instnaces, then render the template
+        if instances is None:
+            instances = []
+
+        render_template(instances, self.template, self.dest)
+        notify(self.notify)
 
     def start(self):
         header = {
@@ -112,28 +130,44 @@ class MessageHandler(Thread):
         if resource['type'] == 'container' and \
                 resource['state'] in ['running', 'removed', 'stopped']:
 
+            api = API(self.rancher_host, self.rancher_port, self.project_id,
+                      self.api_token, self.ssl)
+
             # Filter by stack and/or service name if specified
             if self.stack:
                 stack_name = resource['labels']['io.rancher.stack.name']
                 service_name =\
                     resource['labels']['io.rancher.stack_service.name']
                 service_and_name = '{0}/{1}'.format(self.stack, self.service)
-                if self.service and service_name != service_and_name:
-                    return
+
+                # If we're filtering by service, then load the instances for
+                # this sevice
+                if self.service:
+                    if service_name != service_and_name:
+                        return
+
+                    service = api.get_service(resource)
+                    if service:
+                        instances = api.get_instances(service)
+                        self._render_and_notify(instances)
+                        return
+
+                # If we're filtering only by stack, get the intances in the
+                # stack
                 if stack_name != self.stack:
                     return
+                instances = api.get_instances(stack_name=self.stack)
+                self._render_and_notify(instances)
+            else:
+                instances = api.get_instances()
+                self._render_and_notify(instances)
 
-            api = API(self.rancher_host, self.rancher_port, self.project_id,
-                      self.api_token, self.ssl)
-
-            service = api.get_service(resource)
-            instances = []
-            if service:
-                instances = api.get_instances(service)
-                if instances is None:
-                    instances = []
+    def _render_and_notify(self, instances):
+        if instances is None:
+            render_template([], self.template, self.dest)
+        else:
             render_template(instances, self.template, self.dest)
-            notify(self.notify)
+        notify(self.notify)
 
 
 def render_template(instances, template, dest):

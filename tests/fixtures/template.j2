@@ -1,3 +1,5 @@
 {% for container in containers -%}
-  {{container['primaryIpAddress']}};
+  {% if container['state'] == "running" -%}
+    {{container['primaryIpAddress']}};
+  {% endif %}
 {%- endfor %}
