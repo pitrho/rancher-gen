@@ -224,6 +224,10 @@ you can do something like:
 
     rancher-gen --host rancher.mycompany.com --port 8080 --access-key 1234567890 --secret-key 123ABC456DEF789GHI --project-id 1a5 --stack mystack --service myservice /tmp/template.j2 /tmp/output.txt
 
+### Listening for changes on multiple services under the same stack
+
+    rancher-gen --host rancher.mycompany.com --port 8080 --access-key 1234567890 --secret-key 123ABC456DEF789GHI --project-id 1a5 --stack mystack --service myservice1 --service myservice2 /tmp/template.j2 /tmp/output.txt
+
 ### Using secure connections
 
     rancher-gen --host rancher.mycompany.com --access-key 1234567890 --secret-key 123ABC456DEF789GHI --project-id 1a5 --stack mystack --service myservice --ssl /tmp/template.j2 /tmp/output.txt

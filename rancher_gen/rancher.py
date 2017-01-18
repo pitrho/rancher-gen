@@ -15,6 +15,13 @@ class API(object):
         }
         self._protocol = 'https' if ssl else 'http'
 
+    def get_services(self, stack, services):
+        _services = []
+        for service in services:
+            _services.append(self._get_service_from_stack(stack, service))
+
+        return _services
+
     def get_service(self, resource=None, stack=None, service=None):
         """ Get a service from a rancher resource or by stack and name.
 

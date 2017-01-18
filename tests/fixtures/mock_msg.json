@@ -43,7 +43,7 @@
         "execute": "http://192.168.0.15:8080/v1/projects/1a5/containers/1i316/?action=execute",
         "proxy": "http://192.168.0.15:8080/v1/projects/1a5/containers/1i316/?action=proxy"
       },
-      "name": "teststack_hello_5",
+      "name": "teststack_hello1_5",
       "state": "running",
       "accountId": "1a5",
       "blkioDeviceOptions": null,
@@ -71,7 +71,7 @@
       ],
       "dnsSearch": [
         "teststack.rancher.internal",
-        "hello.teststack.rancher.internal",
+        "hello1.teststack.rancher.internal",
         "rancher.internal"
       ],
       "domainName": null,
@@ -92,12 +92,12 @@
         "io.rancher.project.name": "teststack",
         "io.rancher.service.deployment.unit": "8e92f633-034d-49ce-b217-720fc9e0b589",
         "io.rancher.service.launch.config": "io.rancher.service.primary.launch.config",
-        "io.rancher.project_service.name": "teststack/hello",
+        "io.rancher.project_service.name": "teststack/hello1",
         "io.rancher.stack.name": "teststack",
-        "io.rancher.stack_service.name": "teststack/hello",
+        "io.rancher.stack_service.name": "teststack/hello1",
         "io.rancher.service.hash": "ac26bb0809c237b8c093754780e8d7149bb1a5ce",
         "io.rancher.container.uuid": "44b72739-0e8d-4bf4-9f25-6fbe41607e6e",
-        "io.rancher.container.name": "teststack_hello_5",
+        "io.rancher.container.name": "teststack_hello1_5",
         "io.rancher.container.ip": "10.42.247.7/16"
       },
       "logConfig": {
@@ -142,7 +142,7 @@
             "addservicelink": "http://192.168.0.15:8080/v1/projects/1a5/services/1s134/?action=addservicelink",
             "deactivate": "http://192.168.0.15:8080/v1/projects/1a5/services/1s134/?action=deactivate"
           },
-          "name": "hello",
+          "name": "hello1",
           "state": "updating-active",
           "accountId": "1a5",
           "assignServiceIpAddress": false,

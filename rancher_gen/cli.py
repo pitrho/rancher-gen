@@ -68,7 +68,8 @@ def main():
                                help='Set the log level.')
     optional_args.add_argument('--stack',
                                help="The name of the rancher stack")
-    optional_args.add_argument('--service',
+    optional_args.add_argument('--service', action="append", metavar="SERVICE",
+                               dest="services",
                                help="The name of the rancher service")
     optional_args.add_argument('--ssl', action='store_true',
                                default=False,
@@ -91,7 +92,7 @@ def main():
         handler = RancherConnector(args.host, port, args.project_id,
                                    args.access_key, args.secret_key,
                                    args.template, args.dest, args.ssl,
-                                   args.stack, args.service, args.notify)
+                                   args.stack, args.services, args.notify)
         handler()
     except Exception as e:
         logger.exception(e)

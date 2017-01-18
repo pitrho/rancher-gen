@@ -1,5 +1,8 @@
 # Application Release Notes
 
+## v0.3.0 (2017-01-18)
+* Added ability to listen for changes to multiple services under the same stack.
+
 ## v0.2.1 (2016-10-07)
 * Bug fix to ignore messages from instances that don't have labels (e.g Network
 Agent)

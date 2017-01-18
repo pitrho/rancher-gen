@@ -42,31 +42,35 @@ def stack_service(request):
         state = stack['state']
         time.sleep(1)
 
-    # Wait for service to be active
-    url = '{0}?name={1}'.format(stack['links']['services'], 'hello')
-    res = requests.get(url, headers=headers)
-    state = ''
-    while state != 'active':
-        service = res.json()['data'][0]
-        state = service['state']
-        time.sleep(1)
+    # Wait for services to be active
+    services = []
+    for i in [1, 2]:
+        url = '{0}?name={1}'.format(stack['links']['services'], 'hello%d' % i)
+        res = requests.get(url, headers=headers)
+        state = ''
+        service = None
+        while state != 'active':
+            service = res.json()['data'][0]
+            state = service['state']
+            time.sleep(1)
+        services.append(service)
 
     def teardown():
         requests.delete('{0}/{1}'.format(url, stack['id']), headers=headers)
     request.addfinalizer(teardown)
 
-    return stack, service
+    return stack, services
 
 
 @pytest.fixture(scope='function')
 def mock_message(request, stack_service):
-    stack, service = stack_service
-    service_id = service['id']
+    stack, services = stack_service
+    service_id = services[0]['id']
     with open(os.path.join(os.path.dirname(__file__), 'mock_msg.json')) as fh:
         mock_message = json.loads(fh.read())
     instances_link =\
         mock_message['data']['resource']['services'][0]['links']['instances']
     mock_message['data']['resource']['services'][0]['links']['instances'] =\
-        instances_link.format(stack['accountId'], service['id'])
+        instances_link.format(stack['accountId'], services[0]['id'])
 
     return mock_message

@@ -1,4 +1,9 @@
-hello:
+hello1:
   image: tutum/hello-world
   labels:
     io.rancher.container.requested_ip: "10.42.232.33"
+
+hello2:
+  image: tutum/hello-world
+  labels:
+    io.rancher.container.requested_ip: "10.42.232.34"

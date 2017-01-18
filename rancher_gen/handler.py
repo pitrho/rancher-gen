@@ -23,7 +23,7 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 class RancherConnector(object):
 
     def __init__(self, host, port, project_id, access_key, secret_key,
-                 template, dest, ssl=False, stack=None, service=None,
+                 template, dest, ssl=False, stack=None, services=None,
                  notify=None):
         self.rancher_host = host
         self.rancher_port = port
@@ -33,7 +33,7 @@ class RancherConnector(object):
         self.dest = dest
         self.ssl = ssl
         self.stack = stack
-        self.service = service
+        self.services = services
         self.notify = notify
 
     def __call__(self):
@@ -45,30 +45,31 @@ class RancherConnector(object):
         api = API(self.rancher_host, self.rancher_port, self.project_id,
                   self.api_token, self.ssl)
 
-        # If we're not filtering by stack and service, then load all instances
+        # If we're not filtering by stack and services, then load all instances
         # in the environment
-        if self.stack is None and self.service is None:
+        if self.stack is None and self.services is None:
             instances = api.get_instances()
 
         # If we're only filterting by stack, then load the instances for that
         # stack
-        elif self.stack and self.service is None:
+        elif self.stack and self.services is None:
             instances = api.get_instances(stack_name=self.stack)
 
         # If we're filtering by stack and service, then load the instances for
         # that service
-        elif self.stack and self.service:
+        elif self.stack and self.services and len(self.services) > 0:
             api = API(self.rancher_host, self.rancher_port, self.project_id,
                       self.api_token, self.ssl)
-            service = api.get_service(resource=None, stack=self.stack,
-                                      service=self.service)
-            if service:
-                instances = api.get_instances(service)
+            services = api.get_services(self.stack, self.services)
+
+            instances = []
+            if len(services) > 0:
+                for service in services:
+                    instances += api.get_instances(service)
 
         # If we found any instnaces, then render the template
         if instances is None:
             instances = []
-
         render_template(instances, self.template, self.dest)
         notify(self.notify)
 
@@ -105,13 +106,13 @@ class RancherConnector(object):
             handler = MessageHandler(msg, self.rancher_host, self.rancher_port,
                                      self.project_id, self.api_token,
                                      self.template, self.dest, self.ssl,
-                                     self.stack, self.service, self.notify)
+                                     self.stack, self.services, self.notify)
             handler.start()
 
 
 class MessageHandler(Thread):
     def __init__(self, message, host, port, project_id, api_token, template,
-                 dest, ssl, stack=None, service=None, notify=None):
+                 dest, ssl, stack=None, services=None, notify=None):
         Thread.__init__(self)
         self.message = message
         self.rancher_host = host
@@ -122,7 +123,7 @@ class MessageHandler(Thread):
         self.dest = dest
         self.ssl = ssl
         self.stack = stack
-        self.service = service
+        self.services = services
         self.notify = notify
 
     def run(self):
@@ -145,24 +146,26 @@ class MessageHandler(Thread):
                 stack_name = resource['labels']['io.rancher.stack.name']
                 service_name =\
                     resource['labels']['io.rancher.stack_service.name']
-                service_and_name = '{0}/{1}'.format(self.stack, self.service)
+                service_name = service_name.split('/')[1]
+
+                # if the stacks don't match, then simply return
+                if stack_name != self.stack:
+                    return
 
                 # If we're filtering by service, then load the instances for
                 # this sevice
-                if self.service:
-                    if service_name != service_and_name:
+                if self.services and len(self.services) > 0:
+                    if service_name not in self.services:
                         return
 
-                    service = api.get_service(resource)
-                    if service:
-                        instances = api.get_instances(service)
+                    services = api.get_services(self.stack, self.services)
+                    instances = []
+                    if len(services) > 0:
+                        for service in services:
+                            instances += api.get_instances(service)
                         self._render_and_notify(instances)
                         return
 
-                # If we're filtering only by stack, get the intances in the
-                # stack
-                if stack_name != self.stack:
-                    return
                 instances = api.get_instances(stack_name=self.stack)
                 self._render_and_notify(instances)
             else:
