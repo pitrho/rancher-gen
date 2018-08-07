@@ -12,6 +12,8 @@ class TestRancherConnector:
 
     @classmethod
     def setup_class(cls):
+        template = os.path.join(os.path.dirname(__file__), 'fixtures',
+                                'template.j2')
         cls.out_file = '/tmp/out.txt'
         cls.config = {
             'host': os.getenv('RANCHER_HOST'),
@@ -19,9 +21,7 @@ class TestRancherConnector:
             'project_id': None,
             'access_key': os.getenv('RANCHER_ACCESS_KEY'),
             'secret_key': os.getenv('RANCHER_SECRET_KEY'),
-            'template': os.path.join(os.path.dirname(__file__), 'fixtures',
-                                     'template.j2'),
-            'dest': cls.out_file,
+            'templates': ['{0}:{1}'.format(template, cls.out_file)],
             'ssl': False,
             'stack': 'teststack',
             'services': ['hello1', 'hello2'],
@@ -115,15 +115,15 @@ class TestMessageHandler:
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
         api_token = b64encode("{0}:{1}".format(access_key, secret_key))
+        template = os.path.join(os.path.dirname(__file__), 'fixtures',
+                                'template.j2')
         config = {
             'message': mock_message,
             'host': os.getenv('RANCHER_HOST'),
             'port': int(os.getenv('RANCHER_PORT', 80)),
             'project_id': stack['accountId'],
             'api_token': api_token,
-            'template': os.path.join(os.path.dirname(__file__), 'fixtures',
-                                     'template.j2'),
-            'dest': self.out_file,
+            'templates': ['{0}:{1}'.format(template, self.out_file)],
             'ssl': False,
             'stack': 'teststack',
             'services': ['hello1', 'hello2'],
@@ -179,15 +179,15 @@ class TestMessageHandler:
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
         api_token = b64encode("{0}:{1}".format(access_key, secret_key))
+        template = os.path.join(os.path.dirname(__file__), 'fixtures',
+                                'template.j2')
         config = {
             'message': mock_message,
             'host': os.getenv('RANCHER_HOST'),
             'port': int(os.getenv('RANCHER_PORT', 80)),
             'project_id': stack['accountId'],
             'api_token': api_token,
-            'template': os.path.join(os.path.dirname(__file__), 'fixtures',
-                                     'template.j2'),
-            'dest': self.out_file,
+            'templates': ['{0}:{1}'.format(template, self.out_file)],
             'ssl': False,
             'stack': 'teststack',
             'services': ['badservice'],
@@ -207,15 +207,16 @@ class TestMessageHandler:
         access_key = os.getenv('RANCHER_ACCESS_KEY')
         secret_key = os.getenv('RANCHER_SECRET_KEY')
         api_token = b64encode("{0}:{1}".format(access_key, secret_key))
+        template = os.path.join(os.path.dirname(__file__), 'fixtures',
+                                'template.j2')
         config = {
             'message': mock_message,
             'host': os.getenv('RANCHER_HOST'),
             'port': int(os.getenv('RANCHER_PORT', 80)),
             'project_id': stack['accountId'],
             'api_token': api_token,
-            'template': os.path.join(os.path.dirname(__file__), 'fixtures',
-                                     'template.j2'),
-            'dest': self.out_file,
+            'templates': ['{0}:{1}'.format(template, self.out_file)],
+            'ssl': False,
             'ssl': False,
             'stack': 'teststack',
             'services': ['badservice'],

@@ -12,6 +12,7 @@ from subprocess import call
 from threading import Thread
 
 from .compat import b64encode
+from .exception import RancherConnectionError
 from .rancher import API
 
 logger = logging.getLogger(__name__)
@@ -23,14 +24,13 @@ logging.getLogger("requests").setLevel(logging.WARNING)
 class RancherConnector(object):
 
     def __init__(self, host, port, project_id, access_key, secret_key,
-                 template, dest, ssl=False, stack=None, services=None,
+                 templates, ssl=False, stack=None, services=None,
                  notify=None):
         self.rancher_host = host
         self.rancher_port = port
         self.project_id = project_id
         self.api_token = b64encode("{0}:{1}".format(access_key, secret_key))
-        self.template = template
-        self.dest = dest
+        self.templates = templates
         self.ssl = ssl
         self.stack = stack
         self.services = services
@@ -72,9 +72,10 @@ class RancherConnector(object):
             # so simply return
             return
 
+        # If we found any instances, then render the templates
         if instances is None:
             instances = []
-        render_template(instances, self.template, self.dest)
+        render_templates(instances, self.templates)
         notify(self.notify)
 
     def start(self):
@@ -109,22 +110,21 @@ class RancherConnector(object):
         if msg['name'] == 'resource.change' and msg['data']:
             handler = MessageHandler(msg, self.rancher_host, self.rancher_port,
                                      self.project_id, self.api_token,
-                                     self.template, self.dest, self.ssl,
+                                     self.templates, self.ssl,
                                      self.stack, self.services, self.notify)
             handler.start()
 
 
 class MessageHandler(Thread):
-    def __init__(self, message, host, port, project_id, api_token, template,
-                 dest, ssl, stack=None, services=None, notify=None):
+    def __init__(self, message, host, port, project_id, api_token, templates,
+                 ssl, stack=None, services=None, notify=None):
         Thread.__init__(self)
         self.message = message
         self.rancher_host = host
         self.rancher_port = port
         self.project_id = project_id
         self.api_token = api_token
-        self.template = template
-        self.dest = dest
+        self.templates = templates
         self.ssl = ssl
         self.stack = stack
         self.services = services
@@ -178,22 +178,25 @@ class MessageHandler(Thread):
 
     def _render_and_notify(self, instances):
         if instances is None:
-            render_template([], self.template, self.dest)
+            render_templates([], self.templates)
         else:
-            render_template(instances, self.template, self.dest)
+            render_templates(instances, self.templates)
         notify(self.notify)
 
 
-def render_template(instances, template, dest):
-    template_dir = os.path.dirname(template)
-    template_filename = os.path.basename(template)
-    env = Environment(loader=FileSystemLoader(template_dir))
-    template = env.get_template(template_filename)
-    result = template.render(containers=instances)
+def render_templates(instances, templates):
+    for template in templates:
+        source, dest = template.split(':')
 
-    with open(dest, 'w') as fh:
-        fh.write(result)
-    logger.info("Generated '{0}'".format(dest))
+        template_dir = os.path.dirname(source)
+        template_filename = os.path.basename(source)
+        env = Environment(loader=FileSystemLoader(template_dir))
+        template = env.get_template(template_filename)
+        result = template.render(containers=instances)
+
+        with open(dest, 'w') as fh:
+            fh.write(result)
+        logger.info("Generated '{0}'".format(dest))
 
 
 def notify(notify):
