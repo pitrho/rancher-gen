@@ -45,29 +45,33 @@ class RancherConnector(object):
         api = API(self.rancher_host, self.rancher_port, self.project_id,
                   self.api_token, self.ssl)
 
-        # If we're not filtering by stack and services, then load all instances
-        # in the environment
-        if self.stack is None and self.services is None:
-            instances = api.get_instances()
+        try:
+            # If we're not filtering by stack and services, then load all instances
+            # in the environment
+            if self.stack is None and self.services is None:
+                instances = api.get_instances()
 
-        # If we're only filterting by stack, then load the instances for that
-        # stack
-        elif self.stack and self.services is None:
-            instances = api.get_instances(stack_name=self.stack)
+            # If we're only filterting by stack, then load the instances for that
+            # stack
+            elif self.stack and self.services is None:
+                instances = api.get_instances(stack_name=self.stack)
 
-        # If we're filtering by stack and service, then load the instances for
-        # that service
-        elif self.stack and self.services and len(self.services) > 0:
-            api = API(self.rancher_host, self.rancher_port, self.project_id,
-                      self.api_token, self.ssl)
-            services = api.get_services(self.stack, self.services)
+            # If we're filtering by stack and service, then load the instances for
+            # that service
+            elif self.stack and self.services and len(self.services) > 0:
+                api = API(self.rancher_host, self.rancher_port, self.project_id,
+                        self.api_token, self.ssl)
+                services = api.get_services(self.stack, self.services)
 
-            instances = []
-            if len(services) > 0:
-                for service in services:
-                    instances += api.get_instances(service)
+                instances = []
+                if len(services) > 0:
+                    for service in services:
+                        instances += api.get_instances(service)
+        except RancherConnectionError:
+            # If we made it here, it means we couldn't connect to rancher,
+            # so simply return
+            return
 
-        # If we found any instnaces, then render the template
         if instances is None:
             instances = []
         render_template(instances, self.template, self.dest)

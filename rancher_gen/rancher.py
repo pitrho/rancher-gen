@@ -1,5 +1,11 @@
 from __future__ import absolute_import
+import logging
 import requests
+from requests.exceptions import ConnectionError
+
+from .exception import RancherConnectionError
+
+logger = logging.getLogger(__name__)
 
 
 class API(object):
@@ -57,7 +63,7 @@ class API(object):
                 .format(self._protocol, self.host, self.port, self.project_id)
         else:
             url = service['links']['instances']
-        res = requests.get(url, headers=self._headers)
+        res = self._get(url)       
         res_data = res.json()
         if res_data['data']:
             if stack_name is None:
@@ -92,7 +98,7 @@ class API(object):
         # First get the stack
         url = '{0}://{1}:{2}/v1/projects/{3}/environments'\
             .format(self._protocol, self.host, self.port, self.project_id)
-        res = requests.get(url, headers=self._headers)
+        res = self._get(url)
         res_data = res.json()
         service_stack = None
         if res_data['data'] and len(res_data['data']) > 0:
@@ -105,7 +111,7 @@ class API(object):
             return None
 
         url = service_stack['links']['services']
-        res = requests.get(url, headers=self._headers)
+        res = self._get(url)
         res_data = res.json()
         if res_data['data'] and len(res_data['data']) > 0:
             for service in res_data['data']:
@@ -113,3 +119,11 @@ class API(object):
                     return service
 
         return None
+
+
+    def _get(self, url):
+        try:
+            return requests.get(url, headers=self._headers)
+        except ConnectionError as e:
+            logger.error('Error connecting to rancher server. %s' % e.message)
+            raise RancherConnectionError()
