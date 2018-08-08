@@ -1,5 +1,12 @@
 # Application Release Notes
 
+## v0.4.0 (2018-08-07)
+* Added ability to render multiple templates at once. This change deprecates
+the template and dest positional arguments and introduces a new named argument
+called --template.
+* Bug fix to no pre-render the templates when the app starts if there's an
+issue when connecting to Rancher.)
+
 ## v0.3.0 (2017-01-18)
 * Added ability to listen for changes to multiple services under the same stack.
 
