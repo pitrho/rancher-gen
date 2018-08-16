@@ -1,5 +1,9 @@
 # Application Release Notes
 
+## v0.4.1 (2018-08-16)
+* Bug fix to check that the label `io.rancher.stack.name` exists on the service
+when filtering by stack name.
+
 ## v0.4.0 (2018-08-07)
 * Added ability to render multiple templates at once. This change deprecates
 the template and dest positional arguments and introduces a new named argument

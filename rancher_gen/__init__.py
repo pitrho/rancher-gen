@@ -6,4 +6,4 @@ FORMAT = '%(asctime)s %(name)s %(levelname)s %(message)s'
 logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'

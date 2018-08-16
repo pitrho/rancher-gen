@@ -194,11 +194,39 @@ class TestMessageHandler:
             'notify': None
         }
 
-        # Test with bad service name
         handler = MessageHandler(**config)
         handler.run()
         time.sleep(1)
         assert not os.path.exists(self.out_file)
+
+    def test_does_not_render_with_missing_stack_name_in_message(
+            self, stack_service, mock_message):
+        stack, service = stack_service
+        del mock_message['data']['resource']['labels']['io.rancher.stack.name']
+
+        access_key = os.getenv('RANCHER_ACCESS_KEY')
+        secret_key = os.getenv('RANCHER_SECRET_KEY')
+        api_token = b64encode("{0}:{1}".format(access_key, secret_key))
+        template = os.path.join(os.path.dirname(__file__), 'fixtures',
+                                'template.j2')
+        config = {
+            'message': mock_message,
+            'host': os.getenv('RANCHER_HOST'),
+            'port': int(os.getenv('RANCHER_PORT', 80)),
+            'project_id': stack['accountId'],
+            'api_token': api_token,
+            'templates': ['{0}:{1}'.format(template, self.out_file)],
+            'ssl': False,
+            'stack': 'teststack',
+            'services': ['badservice'],
+            'notify': None
+        }
+
+        handler = MessageHandler(**config)
+        handler.run()
+        time.sleep(1)
+        assert not os.path.exists(self.out_file)
+        
 
     def test_does_not_render_with_invalid_filter(
             self, stack_service, mock_message):

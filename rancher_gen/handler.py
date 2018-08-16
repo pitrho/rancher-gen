@@ -147,6 +147,13 @@ class MessageHandler(Thread):
                 if resource['labels'] is None:
                     return
 
+                # For some reason, when a new host is added to rancher, and
+                # when containers are being deployed to it, some of these
+                # containers don't have the io.rancher.stack.name label. So,
+                # check here to ensure they have it. Otherwise, return.
+                if 'io.rancher.stack.name' not in resource['labels']:
+                    return
+
                 stack_name = resource['labels']['io.rancher.stack.name']
                 service_name =\
                     resource['labels']['io.rancher.stack_service.name']
