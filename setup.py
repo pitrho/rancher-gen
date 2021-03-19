@@ -74,7 +74,7 @@ setup(
         ]
     },
     install_requires=[
-        'Jinja2==2.8',
+        'Jinja2==2.11.3',
         'requests==2.11.1',
         'websocket-client==0.37.0'
     ],
